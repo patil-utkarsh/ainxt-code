@@ -1599,13 +1599,10 @@
                 element.id = id;
                 
                 try {
-                    const { svg } = await mermaid.render(id + '-svg', element.textContent);
-                    const parsed = new DOMParser().parseFromString(svg, 'text/html');
-                    const svgEl = parsed.body.firstElementChild;
-                    if (!svgEl) {
-                        throw new Error('Empty diagram output');
-                    }
-                    element.replaceChildren(svgEl);
+                    // mermaid.run() reads the (still HTML-escaped) diagram source from the
+                    // node and writes the sanitised SVG back itself (securityLevel: 'strict'),
+                    // so this page never re-parses DOM text as HTML.
+                    await mermaid.run({ nodes: [element] });
                 } catch (error) {
                     console.error('Mermaid rendering error:', error);
                     const pre = document.createElement('pre');
